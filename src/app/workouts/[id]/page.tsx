@@ -2,10 +2,11 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { CalendarPlus, Bookmark, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { Workout } from "@/types/workout";
+import DetailActions from "@/components/details/DetailActions";
 
-// নির্দিষ্ট ওয়ার্কআউটের ডাটা ফেচ করার ফাংশন
+// নির্দিষ্ট ওয়ার্কআউটের ডাটা ফেচ করার ফাংশন
 async function getWorkoutDetails(id: string): Promise<Workout | null> {
   try {
     const res = await fetch(`https://api.abcz.workers.dev/api/fitlog/${id}`, {
@@ -136,26 +137,8 @@ export default async function WorkoutDetailsPage({ params }: PageProps) {
               </ol>
             </div>
 
-            {/* Call-to-action Buttons */}
-            <div className="flex flex-wrap gap-4 pt-4">
-              {/* Primary Button: Add to today's plan */}
-              <button
-                type="button"
-                className="inline-flex items-center gap-2 bg-[#ccff00] text-black font-extrabold text-sm sm:text-base px-6 py-3 rounded-xl hover:bg-[#b8e600] active:scale-95 transition-all shadow-md"
-              >
-                <CalendarPlus size={18} strokeWidth={2.5} />
-                Add to today&apos;s plan
-              </button>
-
-              {/* Secondary Button: Save for later */}
-              <button
-                type="button"
-                className="inline-flex items-center gap-2 bg-[#121418] border border-zinc-700 text-zinc-200 font-bold text-sm sm:text-base px-6 py-3 rounded-xl hover:border-zinc-500 hover:text-white active:scale-95 transition-all"
-              >
-                <Bookmark size={18} />
-                Save for later
-              </button>
-            </div>
+            {/* Client Buttons: Add to today's plan & Save for later */}
+            <DetailActions workout={workout} />
 
           </div>
 
