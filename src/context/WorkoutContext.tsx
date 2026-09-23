@@ -25,16 +25,21 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    try {
-      const storedPlan = localStorage.getItem("fitlog_plan");
-      const storedSaved = localStorage.getItem("fitlog_saved");
-      if (storedPlan) setPlanList(JSON.parse(storedPlan));
-      if (storedSaved) setSavedList(JSON.parse(storedSaved));
-    } catch (e) {
-      console.error("Failed to load workouts", e);
-    } finally {
-      setIsLoaded(true);
-    }
+    // Client-side execution নিশ্চিত করে পরবর্তী টাস্কে স্টেট লোড করা
+    const timer = setTimeout(() => {
+      try {
+        const storedPlan = localStorage.getItem("fitlog_plan");
+        const storedSaved = localStorage.getItem("fitlog_saved");
+        if (storedPlan) setPlanList(JSON.parse(storedPlan));
+        if (storedSaved) setSavedList(JSON.parse(storedSaved));
+      } catch (e) {
+        console.error("Failed to load workouts", e);
+      } finally {
+        setIsLoaded(true);
+      }
+    }, 0);
+
+    return () => clearTimeout(timer);
   }, []);
 
   // Today's Plan-এ যুক্ত করা

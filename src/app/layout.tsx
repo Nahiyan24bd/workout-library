@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/shared/Navbar";
+import Footer from "@/components/shared/Footer";
 import { WorkoutProvider } from "@/context/WorkoutContext";
 import { Toaster } from "react-hot-toast";
 
@@ -32,14 +33,10 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-[#0a0a0a] text-white">
         <WorkoutProvider>
-          {/* টোস্ট নোটিফিকেশন কনটেইনার */}
           <Toaster position="top-right" />
-          
-          {/* গ্লোবাল নেভবার */}
           <Navbar />
-          
-          {/* পেজ কনটেন্ট */}
           <main className="flex-1">{children}</main>
+          <Footer />
         </WorkoutProvider>
       </body>
     </html>

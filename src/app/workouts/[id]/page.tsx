@@ -68,7 +68,7 @@ export default async function WorkoutDetailsPage({ params }: PageProps) {
           
           {/* Left Column: Visual/Media */}
           <div className="lg:col-span-5 w-full">
-            <div className="relative w-full aspect-[4/5] bg-[#121418] border border-zinc-800 rounded-3xl overflow-hidden shadow-2xl">
+            <div className="relative w-full aspect-4/5 bg-[#121418] border border-zinc-800 rounded-3xl overflow-hidden shadow-2xl">
               <Image
                 src={workout.image}
                 alt={workout.name}
