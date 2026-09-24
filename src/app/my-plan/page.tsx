@@ -3,9 +3,20 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Clock, Flame, Star, Check, X, ChevronDown, Loader2, Search } from "lucide-react";
+import {
+  Clock,
+  Flame,
+  Star,
+  Check,
+  X,
+  ChevronDown,
+  Loader2,
+  Search,
+  Timer,
+} from "lucide-react";
 import { useWorkout } from "@/context/WorkoutContext";
 import { Workout } from "@/types/workout";
+import WorkoutTimerModal from "@/components/shared/WorkoutTimerModal";
 
 export default function MyPlanPage() {
   const {
@@ -21,24 +32,29 @@ export default function MyPlanPage() {
   const [sortBy, setSortBy] = useState<"duration" | "calories" | "rating">("duration");
   const [searchQuery, setSearchQuery] = useState("");
 
+  // Modal State
+  const [activeTimerWorkout, setActiveTimerWorkout] = useState<Workout | null>(null);
+
   const currentList = activeTab === "plan" ? planList : savedList;
 
-  // লাইভ মেট্রিক্স হিসেব
+  // লাইভ মেট্রিক্স
   const totalExercises = currentList.length;
   const totalMinutes = currentList.reduce((sum, item) => sum + (Number(item.duration) || 0), 0);
   const totalCalories = currentList.reduce((sum, item) => sum + (Number(item.caloriesBurned) || 0), 0);
 
-  // সার্চ এবং সর্টিং লজিক
+  // Daily Goal (5 Lifts max)
+  const planProgress = Math.min((planList.length / 5) * 100, 100);
+
+  // সার্চ এবং সর্ট
   const filteredAndSortedWorkouts = [...currentList]
     .filter((workout) => {
       const query = searchQuery.toLowerCase().trim();
       if (!query) return true;
-      const matchName = workout.name.toLowerCase().includes(query);
-      const matchEquipment = workout.equipment?.toLowerCase().includes(query);
-      const matchTags = workout.muscleGroups?.some((group) =>
-        group.toLowerCase().includes(query)
+      return (
+        workout.name.toLowerCase().includes(query) ||
+        workout.equipment?.toLowerCase().includes(query) ||
+        workout.muscleGroups?.some((group) => group.toLowerCase().includes(query))
       );
-      return matchName || matchEquipment || matchTags;
     })
     .sort((a, b) => {
       if (sortBy === "duration") return (Number(b.duration) || 0) - (Number(a.duration) || 0);
@@ -71,23 +87,39 @@ export default function MyPlanPage() {
         </div>
 
         {/* Dynamic Metrics Summary */}
-        <div className="bg-[#121418] border border-zinc-800/80 rounded-2xl p-6 sm:p-8 grid grid-cols-3 gap-4">
-          <div>
-            <span className="text-xs sm:text-sm font-semibold text-zinc-400">Exercises</span>
-            <div className="text-3xl sm:text-5xl font-black text-[#ccff00] mt-2">
-              {totalExercises}
+        <div className="bg-[#121418] border border-zinc-800/80 rounded-2xl p-6 sm:p-8 space-y-6">
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <span className="text-xs sm:text-sm font-semibold text-zinc-400">Exercises</span>
+              <div className="text-3xl sm:text-5xl font-black text-[#ccff00] mt-2">
+                {totalExercises}
+              </div>
+            </div>
+            <div>
+              <span className="text-xs sm:text-sm font-semibold text-zinc-400">Minutes</span>
+              <div className="text-3xl sm:text-5xl font-black text-white mt-2">
+                {totalMinutes}
+              </div>
+            </div>
+            <div>
+              <span className="text-xs sm:text-sm font-semibold text-zinc-400">Calories</span>
+              <div className="text-3xl sm:text-5xl font-black text-white mt-2">
+                {totalCalories}
+              </div>
             </div>
           </div>
-          <div>
-            <span className="text-xs sm:text-sm font-semibold text-zinc-400">Minutes</span>
-            <div className="text-3xl sm:text-5xl font-black text-white mt-2">
-              {totalMinutes}
+
+          {/* NEW FEATURE: Daily Target Progress Bar */}
+          <div className="border-t border-zinc-800/60 pt-4 space-y-2">
+            <div className="flex justify-between text-xs font-semibold text-zinc-400">
+              <span>Today&apos;s Training Capacity</span>
+              <span className="text-white font-bold">{planList.length} / 5 Lifts</span>
             </div>
-          </div>
-          <div>
-            <span className="text-xs sm:text-sm font-semibold text-zinc-400">Calories</span>
-            <div className="text-3xl sm:text-5xl font-black text-white mt-2">
-              {totalCalories}
+            <div className="w-full h-2 bg-zinc-900 rounded-full overflow-hidden border border-zinc-800">
+              <div
+                className="h-full bg-[#ccff00] transition-all duration-500 rounded-full"
+                style={{ width: `${planProgress}%` }}
+              />
             </div>
           </div>
         </div>
@@ -120,9 +152,8 @@ export default function MyPlanPage() {
             </button>
           </div>
 
-          {/* Search Box & Sort By Dropdown */}
+          {/* Search Box & Sort Dropdown */}
           <div className="flex flex-wrap items-center gap-3">
-            {/* Search Input */}
             <div className="relative flex-1 sm:w-64">
               <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
               <input
@@ -134,7 +165,6 @@ export default function MyPlanPage() {
               />
             </div>
 
-            {/* Sort Dropdown */}
             <div className="flex items-center gap-2 text-sm text-zinc-400">
               <span className="text-xs">Sort By</span>
               <div className="relative">
@@ -156,7 +186,7 @@ export default function MyPlanPage() {
           </div>
         </div>
 
-        {/* Workout Cards List */}
+        {/* Workout Cards */}
         {filteredAndSortedWorkouts.length > 0 ? (
           <div className="space-y-4">
             {filteredAndSortedWorkouts.map((workout: Workout) => (
@@ -180,7 +210,7 @@ export default function MyPlanPage() {
                     </h3>
                     <p className="text-xs text-zinc-400">{workout.equipment}</p>
                     
-                    {/* Inline Stats with Figma Neon-Green Icons */}
+                    {/* Stats Icons */}
                     <div className="flex items-center gap-4 text-xs font-semibold text-zinc-300 pt-0.5">
                       <span className="flex items-center gap-1.5">
                         <Clock size={14} className="text-[#ccff00]" /> {workout.duration} min
@@ -196,7 +226,17 @@ export default function MyPlanPage() {
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center gap-3 self-end md:self-auto shrink-0 pt-2 md:pt-0">
+                <div className="flex items-center gap-2.5 self-end md:self-auto shrink-0 pt-2 md:pt-0">
+                  {/* NEW: Start Timer Button */}
+                  <button
+                    type="button"
+                    onClick={() => setActiveTimerWorkout(workout)}
+                    className="p-2.5 bg-zinc-900 border border-zinc-700/80 hover:border-[#ccff00] text-zinc-300 hover:text-[#ccff00] text-xs font-bold rounded-xl transition-all"
+                    title="Start Live Workout Timer"
+                  >
+                    <Timer size={16} />
+                  </button>
+
                   <Link
                     href={`/workouts/${workout.id}`}
                     className="px-4 py-2 bg-[#181a20] border border-zinc-700/80 hover:border-zinc-500 text-zinc-200 text-xs font-bold rounded-xl transition-all"
@@ -254,6 +294,14 @@ export default function MyPlanPage() {
             )}
           </div>
         )}
+
+        {/* Live Timer Modal */}
+        <WorkoutTimerModal
+          isOpen={!!activeTimerWorkout}
+          onClose={() => setActiveTimerWorkout(null)}
+          workoutName={activeTimerWorkout?.name || ""}
+          durationMinutes={Number(activeTimerWorkout?.duration) || 10}
+        />
 
       </div>
     </div>

@@ -8,8 +8,8 @@ A sleek, high-performance workout tracking and planning web application built us
 
 ## 🌐 Live Demo & Repository
 
-- **Live Deployment:** [https://workout-library-one.vercel.app](https://workout-library-one.vercel.app)
-- **Source Code:** [https://github.com/your-username/workout-library](https://github.com/your-username/workout-library)
+- **Live Deployment:** [https://workout-library-omega.vercel.app/my-plan](https://workout-library-omega.vercel.app/my-plan)
+- **Source Code:** [https://github.com/Nahiyan24bd/workout-library.git](https://github.com/Nahiyan24bd/workout-library.git)
 
 ---
 
