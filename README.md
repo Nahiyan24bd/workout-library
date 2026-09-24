@@ -8,7 +8,7 @@ A sleek, high-performance workout tracking and planning web application built us
 
 ## 🌐 Live Demo & Repository
 
-- **Live Deployment:** [https://workout-library-omega.vercel.app/my-plan](https://workout-library-omega.vercel.app/my-plan)
+- **Live Deployment:** [https://workout-library-omega.vercel.app](https://workout-library-omega.vercel.app)
 - **Source Code:** [https://github.com/Nahiyan24bd/workout-library.git](https://github.com/Nahiyan24bd/workout-library.git)
 
 ---
@@ -21,14 +21,14 @@ A sleek, high-performance workout tracking and planning web application built us
 | **Language** | TypeScript (Strict Mode Type Safety) |
 | **Styling** | Tailwind CSS (Custom Neon Accents & Dark Palette) |
 | **Icons** | Lucide React |
-| **Notifications** | React Hot Toast |
+| **Notifications** | React Hot Toast (Deduplicated Alerts) |
 | **State Management** | React Context API (`WorkoutContext`) + `localStorage` Synchronization |
-| **Data Source** | FitLog REST API (`https://api.abcz.workers.dev/api/fitlog`) |
+| **Data Source** | External REST API (`https://api.abcz.workers.dev/api/fitlog`) |
 | **Deployment** | Vercel |
 
 ---
 
-## ✨ 5 Key Features
+## ✨ Key Features
 
 ### 1. 🗂️ Dynamic Workout Library Grid
 Fetches workout routines from an external API and renders them in an ultra-clean **3×4 responsive grid**. Each card showcases exercise visual assets, muscle group badges, target equipment, and detailed stat chips (Duration, Calories, Rating) with direct routing to exercise detail pages.
@@ -42,20 +42,24 @@ Dynamic individual route (`/workouts/[id]`) presenting an asymmetrical two-colum
 ### 3. 🎯 Rule-Governed Training Scheduler (5-Lift Cap)
 Empowers users to curate daily workout regimens with intelligent validation:
 - Enforces an athlete-focused **5-lift daily ceiling** to prevent overtraining.
-- Action buttons dynamically toggle into disabled states once the cap is reached.
-- Non-intrusive toast notifications confirm additions, saves, or duplicate attempts.
+- Action buttons dynamically toggle into disabled states once the cap is reached or if already added.
+- Deduplicated toast notifications confirm additions, saves, or duplicate attempts.
 
-### 4. 📊 Real-Time Metrics Calculation Dashboard
+### 4. 📊 Real-Time Metrics Calculation & Capacity Progress Bar
 The `/my-plan` hub features an instant computational summary across three core indicators:
 - **Total Exercises** count.
 - **Aggregated Duration** (in minutes).
 - **Cumulative Calories Burned** (in kcal).
+- **Visual Progress Bar:** An integrated capacity tracker showing current plan load against the 5-lift daily limit (e.g., `2 / 5 Lifts`).
 
-Metrics dynamically recalculate whether you toggle between **Today's Plan** and **Saved** logs or mark workouts completed.
+### 5. ⏱️ Live Workout Stopwatch & Rest Timer Modal
+- **Interactive Timer:** Launch a full-screen digital countdown timer directly from any workout card.
+- **Precision Controls:** Includes real-time `Start`, `Pause`, and `Reset` controls with an animated neon completion progress ring.
+- **Completion Alerts:** Visual cues and celebration triggers when the interval concludes.
 
-### 5. 🔍 Multi-Criteria Sorting & Live Search Filter
+### 6. 🔍 Multi-Criteria Sorting & Live Search Filter
 - **Sorting Pipeline:** Instantly re-orders active workout logs by **Duration**, **Calories**, or **Rating** using a custom Chevron-integrated dropdown.
-- **Keyword Search:** Deep searches across workout names, equipment types, and muscle group tags simultaneously.
+- **Live Search Bar:** Real-time search across workout names, equipment types, and muscle group tags.
 - **Workflow Actions:** Includes quick action triggers for *View Details*, *Mark as Done* (with celebration alerts), and *Remove* alongside a custom dashed empty state container.
 
 ---
@@ -71,7 +75,7 @@ workout-library/
 │   │   ├── not-found.tsx          # Custom themed 404 handler
 │   │   ├── page.tsx               # Home landing with Hero & 3x4 Library
 │   │   ├── my-plan/
-│   │   │   └── page.tsx           # Metrics dashboard, tabs, sort & search
+│   │   │   └── page.tsx           # Metrics dashboard, tabs, sort, search & progress
 │   │   └── workouts/
 │   │       └── [id]/
 │   │           └── page.tsx       # Dynamic detail spec sheet & action triggers
@@ -84,7 +88,8 @@ workout-library/
 │   │   │   └── WorkoutCard.tsx    # Individual workout tile card
 │   │   └── shared/
 │   │       ├── Footer.tsx         # Brand footer with legal tagline
-│   │       └── Navbar.tsx         # Header with responsive drawer & live badges
+│   │       ├── Navbar.tsx         # Header with responsive drawer & live badges
+│   │       └── WorkoutTimerModal.tsx # Live countdown & stopwatch timer modal
 │   ├── context/
 │   │   └── WorkoutContext.tsx     # Global store with localStorage persistence
 │   └── types/
@@ -103,7 +108,7 @@ Follow these steps to run FitLog on your local development machine:
 
 1. **Clone the repository:**
    ```bash
-   git clone [https://github.com/your-username/workout-library.git](https://github.com/your-username/workout-library.git)
+   git clone [https://github.com/Nahiyan24bd/workout-library.git](https://github.com/Nahiyan24bd/workout-library.git)
    cd workout-library
    ```
 
