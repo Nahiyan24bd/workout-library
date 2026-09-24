@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Clock, Flame, Star, Check, X, ChevronDown, Loader2 } from "lucide-react";
+import { Clock, Flame, Star, Check, X, ChevronDown, Loader2, Search } from "lucide-react";
 import { useWorkout } from "@/context/WorkoutContext";
 import { Workout } from "@/types/workout";
 
@@ -19,44 +19,34 @@ export default function MyPlanPage() {
 
   const [activeTab, setActiveTab] = useState<"plan" | "saved">("plan");
   const [sortBy, setSortBy] = useState<"duration" | "calories" | "rating">("duration");
+  const [searchQuery, setSearchQuery] = useState("");
 
-  // ১. বর্তমান সক্রিয় ট্যাবের লিস্ট নির্বাচন
   const currentList = activeTab === "plan" ? planList : savedList;
 
-  // ২. লাইভ মেট্রিক্স হিসেব (বর্তমান অ্যাক্টিভ ট্যাব অনুযায়ী)
+  // লাইভ মেট্রিক্স হিসেব
   const totalExercises = currentList.length;
-  
-  const totalMinutes = currentList.reduce((sum, item) => {
-    const mins = Number(item.duration) || 0;
-    return sum + mins;
-  }, 0);
+  const totalMinutes = currentList.reduce((sum, item) => sum + (Number(item.duration) || 0), 0);
+  const totalCalories = currentList.reduce((sum, item) => sum + (Number(item.caloriesBurned) || 0), 0);
 
-  const totalCalories = currentList.reduce((sum, item) => {
-    const cal = Number(item.caloriesBurned) || 0;
-    return sum + cal;
-  }, 0);
+  // সার্চ এবং সর্টিং লজিক
+  const filteredAndSortedWorkouts = [...currentList]
+    .filter((workout) => {
+      const query = searchQuery.toLowerCase().trim();
+      if (!query) return true;
+      const matchName = workout.name.toLowerCase().includes(query);
+      const matchEquipment = workout.equipment?.toLowerCase().includes(query);
+      const matchTags = workout.muscleGroups?.some((group) =>
+        group.toLowerCase().includes(query)
+      );
+      return matchName || matchEquipment || matchTags;
+    })
+    .sort((a, b) => {
+      if (sortBy === "duration") return (Number(b.duration) || 0) - (Number(a.duration) || 0);
+      if (sortBy === "calories") return (Number(b.caloriesBurned) || 0) - (Number(a.caloriesBurned) || 0);
+      if (sortBy === "rating") return (parseFloat(String(b.rating)) || 0) - (parseFloat(String(a.rating)) || 0);
+      return 0;
+    });
 
-  // ৩. সর্টিং লজিক (সরাসরি নতুন অ্যারে তৈরি করে সর্ট করা)
-  const sortedWorkouts = [...currentList].sort((a, b) => {
-    if (sortBy === "duration") {
-      const durA = Number(a.duration) || 0;
-      const durB = Number(b.duration) || 0;
-      return durB - durA; // বড় থেকে ছোট
-    }
-    if (sortBy === "calories") {
-      const calA = Number(a.caloriesBurned) || 0;
-      const calB = Number(b.caloriesBurned) || 0;
-      return calB - calA; // বড় থেকে ছোট
-    }
-    if (sortBy === "rating") {
-      const ratA = parseFloat(String(a.rating)) || 0;
-      const ratB = parseFloat(String(b.rating)) || 0;
-      return ratB - ratA; // সর্বোচ্চ রেটিং আগে
-    }
-    return 0;
-  });
-
-  // Loading State
   if (!isLoaded) {
     return (
       <div className="min-h-[70vh] flex flex-col items-center justify-center gap-3 text-zinc-400">
@@ -80,7 +70,7 @@ export default function MyPlanPage() {
           </p>
         </div>
 
-        {/* Dynamic Metrics Summary (ট্যাব পাল্টালে সাথে সাথে পাল্টাবে) */}
+        {/* Dynamic Metrics Summary */}
         <div className="bg-[#121418] border border-zinc-800/80 rounded-2xl p-6 sm:p-8 grid grid-cols-3 gap-4">
           <div>
             <span className="text-xs sm:text-sm font-semibold text-zinc-400">Exercises</span>
@@ -102,10 +92,10 @@ export default function MyPlanPage() {
           </div>
         </div>
 
-        {/* Tabs & Sort Controls */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
+        {/* Controls: Tabs, Search & Sort */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-2">
           {/* Tabs */}
-          <div className="inline-flex bg-[#121418] border border-zinc-800/80 p-1 rounded-xl">
+          <div className="inline-flex bg-[#121418] border border-zinc-800/80 p-1 rounded-xl shrink-0">
             <button
               type="button"
               onClick={() => setActiveTab("plan")}
@@ -130,33 +120,46 @@ export default function MyPlanPage() {
             </button>
           </div>
 
-          {/* Sort By Dropdown */}
-          <div className="flex items-center gap-2 text-sm text-zinc-400 self-end sm:self-auto">
-            <span>Sort By</span>
-            <div className="relative">
-              <select
-                value={sortBy}
-                onChange={(e) =>
-                  setSortBy(e.target.value as "duration" | "calories" | "rating")
-                }
-                className="appearance-none bg-[#121418] border border-zinc-800 text-white text-xs font-semibold py-2 pl-3 pr-8 rounded-lg focus:outline-none focus:border-zinc-500 cursor-pointer"
-              >
-                <option value="duration">Duration</option>
-                <option value="calories">Calories</option>
-                <option value="rating">Rating</option>
-              </select>
-              <ChevronDown
-                size={14}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-400"
+          {/* Search Box & Sort By Dropdown */}
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Search Input */}
+            <div className="relative flex-1 sm:w-64">
+              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
+              <input
+                type="text"
+                placeholder="Search plan or tag..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-[#121418] border border-zinc-800 text-white text-xs font-semibold py-2 pl-9 pr-3 rounded-lg focus:outline-none focus:border-[#ccff00] transition-colors placeholder:text-zinc-600"
               />
+            </div>
+
+            {/* Sort Dropdown */}
+            <div className="flex items-center gap-2 text-sm text-zinc-400">
+              <span className="text-xs">Sort By</span>
+              <div className="relative">
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as "duration" | "calories" | "rating")}
+                  className="appearance-none bg-[#121418] border border-zinc-800 text-white text-xs font-semibold py-2 pl-3 pr-8 rounded-lg focus:outline-none focus:border-zinc-500 cursor-pointer"
+                >
+                  <option value="duration">Duration</option>
+                  <option value="calories">Calories</option>
+                  <option value="rating">Rating</option>
+                </select>
+                <ChevronDown
+                  size={14}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-400"
+                />
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Workout Cards List বা Empty State */}
-        {sortedWorkouts.length > 0 ? (
+        {/* Workout Cards List */}
+        {filteredAndSortedWorkouts.length > 0 ? (
           <div className="space-y-4">
-            {sortedWorkouts.map((workout: Workout) => (
+            {filteredAndSortedWorkouts.map((workout: Workout) => (
               <div
                 key={workout.id}
                 className="bg-[#121418] border border-zinc-800/80 rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-zinc-700 transition-colors"
@@ -194,7 +197,6 @@ export default function MyPlanPage() {
 
                 {/* Actions */}
                 <div className="flex items-center gap-3 self-end md:self-auto shrink-0 pt-2 md:pt-0">
-                  {/* View Details Button */}
                   <Link
                     href={`/workouts/${workout.id}`}
                     className="px-4 py-2 bg-[#181a20] border border-zinc-700/80 hover:border-zinc-500 text-zinc-200 text-xs font-bold rounded-xl transition-all"
@@ -202,7 +204,6 @@ export default function MyPlanPage() {
                     View Details
                   </Link>
 
-                  {/* Mark as Done (শুধু Today's Plan-এ থাকবে) */}
                   {activeTab === "plan" && (
                     <button
                       type="button"
@@ -214,7 +215,6 @@ export default function MyPlanPage() {
                     </button>
                   )}
 
-                  {/* Remove Button (X) */}
                   <button
                     type="button"
                     onClick={() =>
@@ -235,19 +235,23 @@ export default function MyPlanPage() {
           /* Empty State */
           <div className="border border-dashed border-zinc-800/80 rounded-3xl py-20 px-6 text-center space-y-4">
             <h2 className="text-xl sm:text-2xl font-black text-white tracking-wider uppercase">
-              NOTHING HERE YET
+              {searchQuery ? "NO RESULTS FOUND" : "NOTHING HERE YET"}
             </h2>
             <p className="text-sm text-zinc-400 max-w-md mx-auto">
-              Browse the library and add a lift to get today moving.
+              {searchQuery
+                ? `No workouts found matching "${searchQuery}". Try another keyword.`
+                : "Browse the library and add a lift to get today moving."}
             </p>
-            <div className="pt-2">
-              <Link
-                href="/"
-                className="inline-flex items-center justify-center bg-[#ccff00] text-black font-extrabold text-sm px-6 py-2.5 rounded-xl hover:bg-[#b8e600] transition-all shadow-md"
-              >
-                Go to workouts
-              </Link>
-            </div>
+            {!searchQuery && (
+              <div className="pt-2">
+                <Link
+                  href="/"
+                  className="inline-flex items-center justify-center bg-[#ccff00] text-black font-extrabold text-sm px-6 py-2.5 rounded-xl hover:bg-[#b8e600] transition-all shadow-md"
+                >
+                  Go to workouts
+                </Link>
+              </div>
+            )}
           </div>
         )}
 
