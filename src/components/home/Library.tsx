@@ -1,35 +1,32 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import WorkoutCard from "./WorkoutCard";
 import { Workout } from "@/types/workout";
 
-// API থেকে ডেটা ফেচ করার সাধারণ ফাংশন
-async function getWorkouts(): Promise<Workout[]> {
-  try {
-    const res = await fetch("https://api.abcz.workers.dev/api/fitlog", {
-      next: { revalidate: 3600 }, // ক্যাশিং অপ্টিমাইজেশন
-    });
+const CATEGORIES = ["ALL", "CHEST", "BACK", "ARMS", "LEGS", "CORE"];
 
-    if (!res.ok) {
-      throw new Error("Failed to fetch workouts data");
-    }
+export default function Library({ workouts }: { workouts: Workout[] }) {
+  const [activeCategory, setActiveCategory] = useState("ALL");
 
-    const json = await res.json();
-    // যদি API থেকে সরাসরি অ্যারে আসে অথবা { data: [...] } আকারে আসে
-    return Array.isArray(json) ? json : json.data || [];
-  } catch (error) {
-    console.error("Error fetching workouts:", error);
-    return [];
-  }
-}
-
-const Library = async () => {
-  const workouts = await getWorkouts();
+  // ক্যাটাগরি অনুযায়ী ফিল্টারিং লজিক
+  const filteredWorkouts =
+    activeCategory === "ALL"
+      ? workouts
+      : workouts.filter((workout) =>
+          workout.muscleGroups?.some(
+            (muscle) => muscle.toUpperCase() === activeCategory
+          )
+        );
 
   return (
-    <section id="library" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      {/* Header */}
-      <div className="mb-8 space-y-1">
-        <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight uppercase">
+    <section id="library" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      {/* Heading & Subtitle */}
+      <div className="space-y-2 mb-8">
+        <span className="text-xs font-black uppercase text-[#ccff00] tracking-widest">
+          EXPLORE EXERCISES
+        </span>
+        <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-tight text-white">
           THE LIBRARY
         </h2>
         <p className="text-sm sm:text-base text-zinc-400">
@@ -37,20 +34,41 @@ const Library = async () => {
         </p>
       </div>
 
-      {/* 3x4 Grid on Large Screens & Responsive for Mobile/Tablet */}
-      {workouts.length > 0 ? (
+      {/* NEW: Muscle Group Quick-Filter Pills */}
+      <div className="flex flex-wrap items-center gap-2.5 mb-10">
+        {CATEGORIES.map((category) => {
+          const isActive = activeCategory === category;
+          return (
+            <button
+              key={category}
+              type="button"
+              onClick={() => setActiveCategory(category)}
+              className={`px-4 py-2 rounded-xl text-xs font-black tracking-wider uppercase transition-all duration-200 cursor-pointer ${
+                isActive
+                  ? "bg-[#ccff00] text-black shadow-lg shadow-[#ccff00]/10 scale-105"
+                  : "bg-[#121418] text-zinc-400 border border-zinc-800 hover:border-zinc-600 hover:text-white"
+              }`}
+            >
+              {category}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* 3x4 Responsive Grid */}
+      {filteredWorkouts.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {workouts.map((workout) => (
+          {filteredWorkouts.map((workout) => (
             <WorkoutCard key={workout.id} workout={workout} />
           ))}
         </div>
       ) : (
-        <div className="p-8 text-center bg-[#121418] border border-zinc-800 rounded-2xl text-zinc-400 text-sm">
-          No workouts available at the moment. Please try again later.
+        <div className="text-center py-16 border border-dashed border-zinc-800 rounded-3xl">
+          <p className="text-zinc-400 text-sm font-semibold">
+            No workouts found for {activeCategory}.
+          </p>
         </div>
       )}
     </section>
   );
-};
-
-export default Library;
+}

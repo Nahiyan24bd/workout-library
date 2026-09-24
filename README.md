@@ -23,46 +23,58 @@ A sleek, high-performance workout tracking and planning web application built us
 | **Icons** | Lucide React |
 | **Notifications** | React Hot Toast (Deduplicated Alerts) |
 | **State Management** | React Context API (`WorkoutContext`) + `localStorage` Synchronization |
-| **Data Source** | External REST API (`https://api.abcz.workers.dev/api/fitlog`) |
+| **Data Source** | External REST API (``) |
 | **Deployment** | Vercel |
 
 ---
 
 ## ✨ Key Features
 
-### 1. 🗂️ Dynamic Workout Library Grid
-Fetches workout routines from an external API and renders them in an ultra-clean **3×4 responsive grid**. Each card showcases exercise visual assets, muscle group badges, target equipment, and detailed stat chips (Duration, Calories, Rating) with direct routing to exercise detail pages.
+### 🌟 Core Architectural Features (Minimum 5 Requirements)
 
-### 2. 📋 Comprehensive Exercise Specification Hub
-Dynamic individual route (`/workouts/[id]`) presenting an asymmetrical two-column layout:
-- High-resolution visual frame with aspect ratio safety.
-- Spec sheet displaying **Difficulty**, **Target Equipment**, **Sets**, **Reps**, **Calories**, and **User Ratings**.
-- Step-by-step ordered instructions for proper biomechanics and form execution.
+1. **🗂️ Dynamic Workout Library Grid (3x4 Layout)**
+   Fetches workout routines from an external REST API and renders them in an ultra-clean **3×4 responsive grid**. Each card showcases exercise visual assets, muscle group badges, target equipment, and detailed stat chips (Duration, Calories, Rating) with seamless routing to detail pages.
 
-### 3. 🎯 Rule-Governed Training Scheduler (5-Lift Cap)
-Empowers users to curate daily workout regimens with intelligent validation:
-- Enforces an athlete-focused **5-lift daily ceiling** to prevent overtraining.
-- Action buttons dynamically toggle into disabled states once the cap is reached or if already added.
-- Deduplicated toast notifications confirm additions, saves, or duplicate attempts.
+2. **📋 Comprehensive Exercise Specification Hub**
+   Dynamic individual route (`/workouts/[id]`) presenting an asymmetrical two-column layout:
+   - High-resolution visual frame with aspect ratio safety.
+   - Key Specs table displaying **Difficulty**, **Target Equipment**, **Sets**, **Reps**, **Calories**, and **User Ratings**.
+   - Step-by-step ordered instructions for proper biomechanics and execution.
 
-### 4. 📊 Real-Time Metrics Calculation & Capacity Progress Bar
-The `/my-plan` hub features an instant computational summary across three core indicators:
-- **Total Exercises** count.
-- **Aggregated Duration** (in minutes).
-- **Cumulative Calories Burned** (in kcal).
-- **Visual Progress Bar:** An integrated capacity tracker showing current plan load against the 5-lift daily limit (e.g., `2 / 5 Lifts`).
+3. **🎯 Rule-Governed Training Scheduler (5-Lift Cap)**
+   Empowers users to curate daily workout regimens with intelligent validation:
+   - Enforces an athlete-focused **5-lift daily ceiling** to prevent overtraining.
+   - Action buttons dynamically toggle into disabled states once the cap is reached or if already added.
+   - Persistent synchronization with browser `localStorage`.
 
-### 5. ⏱️ Live Workout Stopwatch & Rest Timer Modal
-- **Interactive Timer:** Launch a full-screen digital countdown timer directly from any workout card.
-- **Precision Controls:** Includes real-time `Start`, `Pause`, and `Reset` controls with an animated neon completion progress ring.
-- **Completion Alerts:** Visual cues and celebration triggers when the interval concludes.
+4. **📊 Real-Time Dynamic Metrics Calculation Dashboard**
+   The `/my-plan` hub features an instant computational summary across three core indicators:
+   - **Total Exercises** count.
+   - **Aggregated Duration** (in minutes).
+   - **Cumulative Calories Burned** (in kcal).
+   Metrics dynamically recalculate whether you toggle between **Today's Plan** and **Saved** logs or mark workouts completed.
 
-### 6. 🔍 Multi-Criteria Sorting & Live Search Filter
-- **Sorting Pipeline:** Instantly re-orders active workout logs by **Duration**, **Calories**, or **Rating** using a custom Chevron-integrated dropdown.
-- **Live Search Bar:** Real-time search across workout names, equipment types, and muscle group tags.
-- **Workflow Actions:** Includes quick action triggers for *View Details*, *Mark as Done* (with celebration alerts), and *Remove* alongside a custom dashed empty state container.
+5. **🔍 Multi-Criteria Sorting & Workflow Actions**
+   - **Sorting Pipeline:** Instantly re-orders active workout logs by **Duration**, **Calories**, or **Rating** using a custom Chevron-integrated dropdown.
+   - **Workflow Triggers:** Includes quick action buttons for *View Details*, *Mark as Done* (with celebration alerts), and *Remove (X)* alongside a custom dashed empty state container.
 
 ---
+
+### 🚀 Newly Added & Advanced Features `[NEWLY ADDED]`
+
+6. **⏱️ Interactive Live Workout Stopwatch & Rest Timer `[NEWLY ADDED]`**
+   - **Digital Modal Timer:** Launch a full-screen interactive countdown timer directly from any workout card.
+   - **Precision Controls:** Features real-time `Start`, `Pause`, and `Reset` controls with an animated neon progress track and session completion celebratory alerts.
+
+7. **📈 Daily Training Capacity Progress Bar `[NEWLY ADDED]`**
+   - An integrated visual capacity meter on the `/my-plan` dashboard showing current plan load against the 5-lift daily limit (e.g., `2 / 5 Lifts`), designed with neon green accents and smooth transition animations.
+
+8. **🔎 Multi-Field Live Search Filter `[NEWLY ADDED]`**
+   - Instant search capability across the user's active logs, allowing real-time filtering by workout name, equipment type, or targeted muscle group tags simultaneously.
+
+9. **🏷️ Muscle Group Quick-Filter System `[NEWLY ADDED]`**
+   - High-performance client-side filtering tabs directly inside "The Library" (`ALL`, `CHEST`, `BACK`, `ARMS`, `LEGS`, `CORE`).
+   - Enables users to isolate muscle-specific exercises instantly without page reloads or layout shifts.
 
 ## 📁 Project Directory Structure
 
@@ -101,35 +113,6 @@ workout-library/
 ```
 
 ---
-
-## 🚀 Local Development Setup
-
-Follow these steps to run FitLog on your local development machine:
-
-1. **Clone the repository:**
-   ```bash
-   git clone [https://github.com/Nahiyan24bd/workout-library.git](https://github.com/Nahiyan24bd/workout-library.git)
-   cd workout-library
-   ```
-
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
-
-3. **Start development server:**
-   ```bash
-   npm run dev
-   ```
-
-4. **Launch application:**
-   Open your browser and navigate to `http://localhost:3000`.
-
-5. **Create production build:**
-   ```bash
-   npm run build
-   npm run start
-   ```
 
 ---
 
