@@ -10,7 +10,7 @@ export default function DetailActions({ workout }: { workout: Workout }) {
 
   return (
     <div className="flex flex-wrap gap-4 pt-4">
-      {/* Primary: Add to today's plan */}
+      {/* Primary Button: Add to today's plan */}
       <button
         type="button"
         onClick={() => addToPlan(workout)}
@@ -20,7 +20,7 @@ export default function DetailActions({ workout }: { workout: Workout }) {
         Add to today&apos;s plan
       </button>
 
-      {/* Secondary: Save for later */}
+      {/* Secondary Button: Save for later */}
       <button
         type="button"
         onClick={() => saveForLater(workout)}
